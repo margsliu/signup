@@ -28,6 +28,7 @@ class Index(webapp2.RequestHandler):
 
         usernameerror = self.request.get('uerror')
         passworderror = self.request.get('perror')
+        emailerror = self.request.get('emerror')
         username = self.request.get('username')
         useremail = self.request.get('useremail')
 
@@ -43,11 +44,11 @@ class Index(webapp2.RequestHandler):
                 <input type="password" name="password2" required/> <font style="color:red" pattern="">{perror}</font>
             <br>
             <label>Email (optional)</label>
-                <input type="email" name="useremail" value="{uemail}"/>
+                <input type="email" name="useremail" value="{uemail}"/> <font style="color:red" pattern="">{eerror}</font>
             <br>
             <input type="submit" value="Submit"/>
         </form>
-        """.format(uname=username, uerror=usernameerror, perror=passworderror, uemail=useremail)
+        """.format(uname=username, uerror=usernameerror, perror=passworderror, uemail=useremail, eerror=emailerror)
 
         main_content = edit_header + form
         response = page_header + main_content + page_footer
@@ -61,6 +62,7 @@ class Welcome(webapp2.RequestHandler):
 
         uerror = ""
         perror = ""
+        emerror = ""
         username = self.request.get('username')
         password1 = self.request.get("password1")
         password2 = self.request.get('password2')
@@ -68,6 +70,7 @@ class Welcome(webapp2.RequestHandler):
 
         user_re = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
         password_re = re.compile(r"^.{3,20}$")
+        email_re = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
         # check if passwords match
         if not password1 == password2:
@@ -84,6 +87,10 @@ class Welcome(webapp2.RequestHandler):
             uerror = "Invalid username, try again."
             self.redirect('/?uerror={}&useremail={}'.format(cgi.escape(uerror, quote=True),useremail))
 
+        # check if email is valid
+        if email_re.match(useremail) == None:
+            emerror = "Invalid username, try again."
+            self.redirect('/?username={}&emerror={}'.format(cgi.escape(emerror, quote=True),useremail))
 
         welcome_message = "<h1>Welcome, {0}! You're gonna have SO many onions now.</h1>".format(username)
 
